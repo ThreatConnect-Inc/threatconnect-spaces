@@ -18,9 +18,12 @@ This Repository is public. However, contributions will be accepted only from ide
   + Spaces README.md should include the following headers:
     + Summary
     + App Dependencies
+    + Context (Optional)
     + Use Cases (Optional)
 + Spaces Apps should be included in unique, separate folders.
   + Spaces Apps must include the zip/tcx file of the App.
+
+The "Context" header is used for "Contextually Aware" Spaces Apps that are designed to be used in relation to one of more specific data objects (e.g. Address or Incident). This section should be used to provide details of the intended context.
 
 ## Contributing
 
