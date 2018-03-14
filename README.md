@@ -14,7 +14,7 @@ This Repository is public. However, contributions will be accepted only from ide
 
 ## Guidelines
 
-+ All Playbooks Spaces Apps must have their own README.md files.
++ All ThreatConnect Spaces Apps must have their own README.md files.
   + Spaces README.md should include the following headers:
     + Summary
     + App Dependencies
