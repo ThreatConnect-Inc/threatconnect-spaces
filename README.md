@@ -22,8 +22,12 @@ This Repository is public. However, contributions will be accepted only from ide
     + Use Cases (Optional)
 + Spaces Apps should be included in unique, separate folders.
   + Spaces Apps must include the zip/tcx file of the App.
++ Spaces Apps should be named with a prefix designating their type:
+  + TCX = Context Aware
+  + TCS = Standard Spaces
+  + TCM = Menu
 
-The "Context" header is used for "Contextually Aware" Spaces Apps that are designed to be used in relation to one of more specific data objects (e.g. Address or Incident). This section should be used to provide details of the intended context.
+The "Context" header is used for "Context Aware" Spaces Apps that are designed to be used in relation to one of more specific data objects (e.g. Address or Incident). This section should be used to provide details of the intended context.
 
 ## Contributing
 
@@ -33,7 +37,11 @@ For more information on contributing to this repository, see our [Contributions 
 
 Documentation for the ThreatConnectⓇ App Framework is available here: https://docs.threatconnect.com/en/latest/tcex/tcex.html. The framework provides commonly used Classes and Methods for writing ThreatConnect Apps. The Framework is intended to speed up the development process and ensure Apps contains the core functionality required.
 
-Documentation specific to Spaces can be found here: https://kb.threatconnect.com/customer/en/portal/articles/2256255-spaces.
+Documentation specific to Spaces can be found here:
+
+https://kb.threatconnect.com/customer/en/portal/articles/2256255-spaces
+https://threatconnect-inc.github.io/spaces-ng/
+https://threatconnect-inc.github.io/threatconnect-ng/
 
 
 ## Contact
