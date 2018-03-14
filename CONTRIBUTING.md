@@ -16,4 +16,9 @@ In order to contribute a Spaces App, create a Pull request. To use the Spaces Ap
 
 **Make it clear whether the Spaces App is intended to be contextually aware.** If your Spaces App is intended to be used with a particular data object (such as an Address or an Incident), make it clear in the title and/or description.
 
+**Spaces Apps should be named with a prefix designating their type:**
++ TCX = Context Aware
++ TCS = Standard Spaces
++ TCM = Menu
+
 If you have any feedback, please open an Issue in this repo. For general questions, please contact support@threatconnect.com.
