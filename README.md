@@ -39,11 +39,9 @@ Documentation for the ThreatConnectⓇ App Framework is available here: https://
 
 Documentation specific to Spaces can be found here:
 
-https://kb.threatconnect.com/customer/en/portal/articles/2256255-spaces
-
-https://threatconnect-inc.github.io/spaces-ng/
-
-https://threatconnect-inc.github.io/threatconnect-ng/
++ https://kb.threatconnect.com/customer/en/portal/articles/2256255-spaces
++ https://threatconnect-inc.github.io/spaces-ng/
++ https://threatconnect-inc.github.io/threatconnect-ng/
 
 
 ## Contact
