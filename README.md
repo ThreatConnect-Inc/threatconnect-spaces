@@ -43,6 +43,14 @@ Documentation specific to Spaces can be found here:
 + https://threatconnect-inc.github.io/spaces-ng/
 + https://threatconnect-inc.github.io/threatconnect-ng/
 
+## Other Repositories
+
+We currently provide our customers with four repositories to share your projects with the rest of the ThreatConnect Community.
+
++ [Playbooks & Playbook Apps](https://github.com/ThreatConnect-Inc/threatconnect-playbooks) - For automation and orchestration using our Playbooks capability.
++ [Job Apps](https://github.com/ThreatConnect-Inc/threatconnect-jobs) - For background apps.
++ [Spaces Apps](https://github.com/ThreatConnect-Inc/threatconnect-spaces) - For apps that run in the TheratConnect UI.
++ [Tools & Utilities](https://github.com/ThreatConnect-Inc/threatconnect-tools) - For miscellaneous tools that help other ThreatConnect developers.
 
 ## Contact
 If you have any questions, bugs, or requests please contact support@threatconnect.com.
