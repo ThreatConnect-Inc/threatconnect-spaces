@@ -1,0 +1,318 @@
+/*
+
+COLOR KEY
+
+  PRIMARY
+
+  #f26724 - TC Orange
+  #646469 - TC Dark Grey
+  #07213a - TC Blue
+
+
+  SECONDARY
+
+  #06213b - TC Dark Blue
+  #2878b7 - TC Light Blue
+  #cccbcb - TC Light Grey
+
+*/
+
+/* Styling for button-group toggle. */
+.button-toggle {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  border: 1px solid black;
+  border-radius: 0.625rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.button-toggle .button {
+  background: transparent;
+  color: black;
+  margin-bottom: 0;
+  -webkit-flex: 1 0 0;
+      -ms-flex: 1 0 0px;
+          flex: 1 0 0;
+}
+
+.button-toggle .button:nth-child(n+1) {
+  border-left: 1px solid black;
+}
+
+.button-toggle .button.is-active {
+  border-bottom: 2px solid #f26724;
+  font-weight: bold;
+}
+/* Styling for button-group toggle. */
+
+body {
+    font-family: sans-serif;
+    background-color: #fefefe;
+}
+
+/*.well {
+  background-color: #f6f6f6;
+  border: 1px solid #e7e7e7;
+  padding: .5em;
+  margin-top: 1em;
+}
+*/
+.button {
+    background-color: #2878b7;
+}
+
+.vspace-xs {
+    margin-top: 1%;
+}
+
+.vspace-sm {
+    margin-top: 2%;
+}
+
+.vspace-md {
+    margin-top: 3%;
+}
+
+.vspace-lg {
+    margin-top: 5%;
+}
+
+/* Adding styling for growl messages. */
+.success-growl {
+    background-color: #58b957;
+    font-size: 1.5em;
+}
+
+.warning-growl {
+    background-color: #f2ae43;
+    font-size: 1.5em;
+    color: black;
+}
+
+.failure-growl {
+    background-color: #db524b;
+    font-size: 1.5em;
+}
+/* End stylings for growl messages. */
+
+.focused-input:focus {
+    border: 1px solid #71a9d0;
+}
+
+/* Change the cursor to a pointer (used in the "recent groups" list for phase one). */
+.point-me {
+    cursor: pointer;
+}
+
+.indicator-link {  }
+
+#phase-zero {
+    margin-top: 1.5em;
+    margin-left: 1.5em;
+}
+
+#indicator-textarea {
+    /*margin-left: .75em;*/
+}
+
+#phase-one-next {
+    width: 32%;
+}
+
+#phase-one {
+    margin-top: 1.5em;
+    margin-left: 1.5em;
+}
+
+#phase-two {}
+
+#meta-operations {
+    margin: 0 auto;
+    margin-top: 2em;
+}
+
+.resized-modal {
+    height: 50%;
+}
+
+.hugeModal {
+  height: 87%;
+  width: 200%;
+}
+
+.xl-modal {
+    height: 80%;
+}
+
+.new {
+    color: red;
+}
+
+.dnsResolution {
+    color: blue;
+}
+
+/* Styling for the footer which opens the box for associated groups. */
+.footerholder {
+    background: none repeat scroll 0 0 transparent;
+    bottom: 0;
+    right: 1%;
+    position: fixed;
+    text-align: right;
+}
+
+.footer {
+    margin: auto;
+    width: 30em;
+}
+
+/*.modal-bottom {
+    position: absolute;
+    bottom: 0%;
+    }*/
+
+/*.indicator-block-title {
+    vertical-align: text-bottom;
+    height: 100%;
+}
+
+.side-ways {
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    }*/
+
+.indicator-block {
+    /*background-color: #ffffff;*/
+    /*border: black 0.1em solid;*/
+    /*box-shadow: 0.25em 0em 1em #888888;*/
+    /*width: 76%;*/
+    margin: 0 auto;
+    /*margin: .5em;*/
+    margin-bottom: 3.5em;
+    /*padding: 0.5em;*/
+    /*text-align: center;*/
+}
+
+.indicator-block .badge {
+    vertical-align: 50%;
+    font-size: 0.45em;
+}
+
+/* CSS FOR TWITTER TYPE-AHEAD */
+.typeahead, .tt-query, .tt-hint {
+    border-radius: 4px;
+    font-size: 22px;
+    width: 150%;
+}
+.tt-hint {
+    color: #999999;
+}
+.tt-menu {
+    background-color: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    margin-top: -0.9em;
+    padding: 0.6em 0;
+    width: 24em;
+}
+.tt-suggestion {
+    font-size: 22px;
+    padding: 0.25em 20px;
+}
+.tt-suggestion:hover {
+    cursor: pointer;
+    background-color: #767676;
+    color: #FFFFFF;
+}
+.tt-suggestion p {
+    margin: 0;
+}
+/* END CSS FOR TWITTER TYPE-AHEAD. */
+
+/* CSS FOR THE SPINNER WHEN LOADING VT RESULTS. */
+.button-add-cart {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-add-cart.is-adding {
+    border-radius: 25px;
+    max-width: 50px;
+    max-height: 50px;
+    cursor: default;
+}
+
+.button-add-cart.is-adding::after {
+    -webkit-animation: fadeIn 0.3s ease-in, spin 1.3s infinite ease-in-out;
+    animation: fadeIn 0.3s ease-in, spin 1.3s infinite ease-in-out;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+}
+
+.button-add-cart.is-adding span {
+    opacity: 0;
+}
+
+.button-add-cart::after {
+    content: " ";
+    border-top: solid 4px #71a9d0;
+    border-right: solid 4px #71a9d0;
+    border-bottom: solid 4px #71a9d0;
+    border-left: solid 4px transparent;
+    border-radius: 50px;
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    bottom: 7px;
+    left: 7px;
+    margin: auto;
+    max-width: 30px;
+    max-height: 30px;
+    opacity: 0;
+    z-index: 1;
+}
+
+@-webkit-keyframes spin {
+    0%, 5% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+  }
+  95%, 100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0%, 5% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+}
+95%, 100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+}
+}
+
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+}
+100% {
+    opacity: 1;
+}
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+}
+100% {
+    opacity: 1;
+}
+}
+/* END CSS FOR THE SPINNER WHEN LOADING VT RESULTS. */

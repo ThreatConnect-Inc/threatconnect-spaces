@@ -1,0 +1,42 @@
+{
+    "programVersion": "3.1.0",
+    "programLanguage": "none",
+    "languageVersion": "JS",
+    "runtimeLevel": "SpaceOrganization",
+    "runtimeContext": [],
+    "allowOnDemand": true,
+    "programIcon": "spaces-icon-import",
+    "params": [ {
+        "name": "pdfReaderPlaybookLink",
+        "label": "Link to PDF Reader Playbook",
+        "type": "String",
+        "default": ""
+    }, {
+        "name": "urlReaderPlaybookLink",
+        "label": "Link to URL Reader Playbook",
+        "type": "String",
+        "default": ""
+    }, {
+        "name": "vtAPIKey",
+        "label": "VT API Key (Public or Private)",
+        "encrypt": true,
+        "type": "String",
+        "validValues": ["${USER:KEYCHAIN}", "${ORGANIZATION:KEYCHAIN}"]
+    }, {
+        "name": "maxVTQueries",
+        "label": "Maximum Queries to VirusTotal",
+        "default": "50",
+        "type": "String"
+    }, {
+        "name": "customMetricOwner",
+        "label": "Owner of the Custom Metric",
+        "type": "String",
+        "validValues": ["${OWNERS}"]
+    }, {
+        "name": "appAnalyticsKeyName",
+        "label": "Key for Accessing Analytics for this Particular App (PLEASE DON'T CHANGE THIS VALUE UNLESS YOU KNOW WHAT YOU'RE DOING)",
+        "type": "String",
+        "required": true,
+        "default": "indicator-importer"
+    } ]
+}
