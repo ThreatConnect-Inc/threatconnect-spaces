@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Indicator Importer</title>
+
+    <!-- Vendor libraries -->
+    <script type="text/javascript" src="./js/vendor/foundation/vendor/jquery.js"></script>
+    <script type="text/javascript" src="./js/vendor/twitter-typeahead/typeahead.bundle.js"></script>
+
+    <!-- Vue js -->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+
+    <!-- App Specific Resources -->
+    <script src="./js/tc/threatconnect.js" type="text/javascript"></script>
+    <script src="./js/indicatorImporterUtility.js"></script>
+    <script src="./js/indicatorBlock.js"></script>
+
+    <!-- Joyride JS imports -->
+    <script type="text/javascript" src="./js/vendor/joyride/jquery.cookie.js"></script>
+    <script type="text/javascript" src="./js/vendor/joyride/modernizr.mq.js"></script>
+    <script type="text/javascript" src="./js/vendor/joyride/jquery.joyride-2.1.js"></script>
+
+    <!-- jQuery growl -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-jgrowl/1.4.1/jquery.jgrowl.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jgrowl/1.4.1/jquery.jgrowl.min.js"></script>
+
+    <!-- Libraries for ThreatConnect javascript SDK -->
+    <script type="text/javascript" src="./js/tc/libs/core.js"></script>
+    <script type="text/javascript" src="./js/tc/libs/sha256.js"></script>
+    <script type="text/javascript" src="./js/tc/libs/hmac.js"></script>
+    <script type="text/javascript" src="./js/tc/libs/enc-base64.js"></script>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="./styles/vendor/foundation/foundation.css">
+    <link rel="stylesheet" type="text/css" href="./styles/indicator-importer.css">
+    <!-- <link rel="stylesheet" type="text/css" href="./styles/dark-indicator-importer.css"> -->
+    <link rel="stylesheet" type="text/css" href="./styles/vendor/joyride/joyride-2.1.css">
+    <!-- Font-awesome cdn (for the external link icon) -->
+    <link rel="stylesheet" href="https://opensource.keycdn.com/fontawesome/4.7.0/font-awesome.min.css" integrity="sha384-dNpIIXE8U05kAbPhy3G1cz+yZmTzA6CY8Vg/u2L9xRnHjJiAK76m2BIEaSEV+/aU" crossorigin="anonymous">
+
+    <!-- pdf.js -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/1.9.659/pdf.js"></script>
+    <!-- TODO: see if this script is necessary (3) -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/1.9.659/pdf.worker.js"></script>
+
+    <!-- Fanging script -->
+    <script type="text/javascript" src="./js/fanger.js"></script>
+</head>
+
+<!-- This is a template for the profile modal which displays the saved profiles. -->
+<template id="profile">
+    <li style="list-style-type: none;">
+        <label><input class="profileCheckbox" type="checkbox" name="profile-creator">
+        <h5 style="display: inline;"><b>{{ profile.name }}</b></h5></label>
+        <div v-if="profile.attributes != []">
+            Attributes
+            <ul>
+                <li v-for="attribute in profile.attributes"><i>{{ attribute.type }}</i>: {{ attribute.value }}</li>
+            </ul>
+        </div>
+        <div v-if="profile.tags != []">
+            Tags
+            <ul>
+                <li v-for="tag in profile.tags">{{ tag }}</li>
+            </ul>
+        </div>
+    </li>
+</template>
+
+<body>
+    <div id="bulk-indicator-app" style="visibility: hidden;">
+        <!-- This modal is separate from the other modals so it can have it's own vue -->
+        <div class="reveal xl-modal" id="danger-zone" data-reveal>
+            <h2>Danger Zone - Be Careful!</h2>
+            <button class="close-button" data-close aria-label="Close reveal" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+
+            <div>
+                Remove attributes from selected indicators (these inputs are not case-sensative) - <span style="color: red;">this functionality is coming soon...</span>
+                <input type="text" name="" placeholder="Attribute type" v-model="attributeType" disabled>
+                <input type="text" name="" placeholder="Attribute value" v-model="attributeValue" disabled>
+                <button id="dangerZoneAttributeStatus" class="button secondary" v-on:click="removeAttribute" disabled>Remove Attribute</button>
+            </div>
+
+            <hr>
+
+            <div>
+                Remove tags from selected indicators
+                <form class="tag-typeahead">
+                    <div class="small-9 medium-9 large-9 columns">
+                        <!-- The input element for tags can't have a v-model becuase of the way the type-ahead works. This is why is just calls the tcrequester directly. -->
+                        <input id="dangerZoneTag" class='typeahead tt-query focused-input tag-typeahead-input' type='text' placeholder='Start typing a tag...' title='Start typing a tag' autocomplete='off' spellcheck='false' />
+                    </div>
+                    <div class="small-3 medium-3 large-3 columns">
+                        <button id="dangerZoneTagStatus" type="button" class="button secondary" onclick="TCREQUESTER.removeTag('#dangerZoneTag', '#dangerZoneTagStatus')">Remove Tag</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="modals">
+            <div class="reveal resized-modal" id="association-modal" data-reveal>
+                <!-- TODO: eventually, I should remove these headings from each modal... the modal itself shouldn't need a heading -->
+                <h2>Add Associations</h2>
+                <button class="close-button" data-close aria-label="Close reveal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+ 
+                <form id='association-typeahead'>
+                    <div class="small-8 medium-8 large-8 columns">
+                        <input id="association-typeahead-input" class='typeahead tt-query focused-input' type='text' placeholder='Start typing an association...' title='Start typing an association' autocomplete='off' spellcheck='false' />
+                    </div>
+                    <div class="small-4 medium-4 large-4 columns">
+                        <button id="association-modal-status" type="button" class="button" onclick="TCREQUESTER.addAssociation('#association-typeahead-input', '#association-modal-status');">Add association</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="reveal hugeModal" id="attribute-modal" data-reveal>
+                <button class="close-button" data-close aria-label="Close reveal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <div id="attribute-ui">
+                    <div id="attibute-value-input" class="row collapse">
+                      <div class="medium-3 large-4 columns">
+                        <h6><b>Common Attributes</b></h6>
+
+                        <ul>
+                            <li v-for="attribute in wizardAttributes" v-on:mousedown="selectedAttributeType = attribute.name"><a><b>{{ attribute.name.substr(0) }}</b>{{ attribute.name.substr(1) }}</a></li>
+                        </ul>
+
+                        <hr>
+
+                        <h6><b>Additional Attributes</b></h6>
+
+                        <ul>
+                            <li v-for="attribute in additionalAttributes" v-on:mousedown="selectedAttributeType = attribute.name"><a>{{ attribute.name }}</a></li>
+                        </ul>
+                      </div>
+                      <div class="medium-9 large-8 columns">
+                        <div>
+                            <span v-if="selectedAttributeType == ''"><<< Click on an attribute type of the left to get started</span>
+                            <h6><b>{{ selectedAttributeType }}</b></h6>
+                            <div id="string" v-if="validationType == 'String'">
+                                <textarea rows="10" placeholder="Enter attribute here..." v-model="attributeValue"></textarea>
+                                <label>Default: <input type="checkbox" name="" v-model=attributeDefault></label>
+                            </div>
+                            <div id="integer" v-if="validationType == 'Integer'">
+                                <input type="number" :min=validationRule.split(':')[0] :max=validationRule.split(':')[1] v-model="attributeValue"> <code>[{{ validationRule.split(':')[0] }}-{{ validationRule.split(':')[1] }}]</code>
+                                <br><br>
+                            </div>
+                            <div id="selectone" v-if="validationType == 'SelectOne'">
+                                <select v-model="attributeValue">
+                                    <option v-for="option in validationRule.split(';')" v-bind:key="option" v-bind:value="option">{{ option }}</option>
+                                </select>
+                            </div>
+                            <div id="selectradio" v-if="validationType == 'SelectRadio'">
+                                <form>
+                                    <div v-for="option in validationRule.split(';')">
+                                        <label><input type="radio" :value="option" name="attribute-option" v-model="attributeValue">{{ option }}</label>
+                                    </div>
+                                </form>
+                            </div>
+                            <div id="regex" v-if="validationType == 'Regex'">
+                                <input type="text" :pattern="validationRule" v-model="attributeValue"> <code>{{ validationRule }}</code>
+                                <br><br>
+                            </div>
+                            <div id="date" v-if="validationType == 'Date'">
+                                <input type="date" v-model="attributeValue">
+                            </div>
+                            <div id="datetime" v-if="validationType == 'DateTime'">
+                              <input type="datetime-local" v-model="attributeValue">
+                            </div>
+                        </div>
+
+                        <div id="attribute-submit">
+                            <button id="attributeModalStatus" class="button" v-on:click="addAttribute('#attributeModalStatus')" v-if="selectedAttributeType != ''">Add attribute</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reveal resized-modal" id="file-action-modal" data-reveal>
+                <h2>File Actions</h2>
+                <button class="close-button" data-close aria-label="Close reveal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <div class="row">
+                  <select v-model="selectedFileAction">
+                    <option v-for="fileAction in fileActions">{{ fileAction.name[0].toUpperCase() }}{{ fileAction.name.substr(1) }} ({{ fileAction.types.join(", ") }})</option>
+                  </select>
+
+                  <input type="text" name="file hash" placeholder="Enter a file hash" v-model="fileActionHash">
+                </div>
+
+                <br>
+
+                <button id="file-action-modal-status" type="button" class="button" v-on:click="applyFileAction('#file-action-modal-status')">Add file action</button>
+
+                <br>
+
+                <div class="callout warning">
+                    <h5>WARNING</h5>
+                    In this app, the file actions are created in the 'opposite' direction they are created in the platform. Instead of starting with the file on whose behaviour graph you would like the association to appear, in this app you need to select the indicators you would like to appear on the behaviour graph and then paste the file hash of the file indicator on whose behaviour graph the selected indicators will appear.
+                </div>
+            </div>
+
+            <div class="reveal resized-modal" id="file-occur-modal" data-reveal>
+                <h2>Add File Occurrence</h2>
+                <button class="close-button" data-close aria-label="Close reveal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <label>File Name:
+                            <input class="focused-input" id="file-occur-name" type="text">
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <label>Path:
+                            <input class="focused-input" id="file-occur-path" type="text" value="">
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <label>Date:
+                            <input class="focused-input" id="file-occur-date" type="date">
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <button id="file-occur-submit" class="button" onclick="TCREQUESTER.addFileOccurrence('#file-occur-name', '#file-occur-path', '#file-occur-date', '#file-occur-submit')">Add File Occurrence</button>
+                </div>
+            </div>
+
+            <div class="reveal resized-modal" id="file-size-modal" data-reveal>
+                <h2>Add File Size</h2>
+                <button class="close-button" data-close aria-label="Close reveal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <label>File Size (bytes):
+                            <input class="focused-input" id="file-size" type="number" value="" required pattern="[0-9]">
+                            <span class="form-error">
+                              Please enter a file size that is an integer between 0 and 2,147,483,647 representing the size of the file (in bytes).
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <button id="file-size-submit" class="button" onclick="TCREQUESTER.addFileSize('#file-size', '#file-size-submit')">Add file size</button>
+                </div>
+            </div>
+
+            <div class="reveal resized-modal" id="profile-modal" data-reveal>
+                <h2>Apply a Profile</h2>
+                <button class="close-button" data-close aria-label="Close reveal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <div class="row">
+                  <div class="columns">
+                    <ul>
+                      <profile v-for="profile in profiles" v-bind:profile="profile" :key="profile.name"></profile>
+                    </ul>
+                  </div>
+                </div>
+
+                <br>
+
+                <button id="profile-modal-status" type="button" class="button" onclick="VUEAPPMANAGER.phaseTwoVue.applyProfiles('#profile-modal-status')">Apply selected profiles</button>
+            </div>
+
+            <div class="reveal resized-modal" id="rating-modal" data-reveal>
+                <h2>Rate the Indicators</h2>
+                <button class="close-button" data-close aria-label="Close reveal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <form data-abide novalidate>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>Threat Rating:
+                                <input class="focused-input" id="threat-rating" type="number" value="2.5" pattern="^[0-4](\.[0-9][0-9]?)?$|^5$">
+                                <span class="form-error">
+                                  Please enter a float or integer for the threat rating that is between 0 and 5 (inclusive) with no more than two digits after the decimal.
+                                </span>
+                            </label>
+                        </div>
+                        <div class="small-12 columns">
+                            <label>Confidence Rating:
+                                <input class="focused-input" id="confidence-rating" type="number" value="89" pattern="^[0-9][0-9]?$|^100$">
+                                <span class="form-error">
+                                  Please enter an integer for the confidence rating that is between 0 and 100 (inclusive).
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="modal-bottom">
+                    <a  id="rating-modal-status" href="#0" class="button modal-button" onclick="TCREQUESTER.addRatings('#threat-rating', '#confidence-rating', '#rating-modal-status')">Apply ratings</a>
+                </div>
+            </div>
+
+            <div class="reveal resized-modal" id="sec-label-modal" data-reveal>
+                <h2>Add Security Labels</h2>
+                <button class="close-button" data-close aria-label="Close reveal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <listed-sec-label v-for="label in securityLabels" v-bind:slabel="label" :key="label.securityLabelName"></listed-sec-label>
+
+                <div class="modal-bottom">
+                    <a id="sec-label-modal-status" href="#0" class="button modal-button" onclick="TCREQUESTER.addSecurityLabels('#sec-label-modal', '#sec-label-modal-status')">Add security labels</a>
+                </div>
+            </div>
+
+            <div class="reveal resized-modal" id="tag-modal" data-reveal>
+                <h2>Add Tags</h2>
+                <button class="close-button" data-close aria-label="Close reveal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <form id='tag-typeahead'>
+                    <div class="small-9 medium-9 large-9 columns">
+                        <input id="tag-typeahead-input" class='typeahead tt-query focused-input tag-typeahead-input' type='text' placeholder='Start typing a tag...' title='Start typing a tag' autocomplete='off' spellcheck='false' />
+                    </div>
+                    <div class="small-3 medium-3 large-3 columns">
+                        <button id="tag-modal-status" type="button" class="button" onclick="TCREQUESTER.addTag('#tag-typeahead-input', '#tag-modal-status')">Add tag</button>
+                    </div>
+                    <div class="row">
+                        <h5 v-if="addedTags.length > 0">Added Tags:</h5>
+                        <ul>
+                            <added-tags v-for="tag in addedTags" v-bind:tag="tag" :key="tag"></added-tags>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div> <!-- end modals div -->
+
+        <!-- APP PHASES: -->
+        <div id="phase-zero">
+            <div v-if="!loadingPhaseOne">
+                <div class="small-9 medium-9 large-9 float-left well">
+                    <form id='owner-typeahead'>
+                        <input id="owner-typeahead-input" class='typeahead tt-query focused-input' type='text' placeholder='Start typing an owner...' title='Start typing an owner' autocomplete='off' spellcheck='false' />
+                    </form>
+                    <div>
+                        <textarea id="indicator-textarea" class="focused-input" rows="31" placeholder='Type/Paste indicators here...' v-on:focus="getRecentGroups"></textarea>
+                        <button class="button secondary" data-open="manual-import">Import content</button>
+                        <div class="float-right small-3 medium-3 large-3">
+                            <label class="float-right"><input id="breakDownNetworkInds" type="checkbox" checked>Break down host and URL indicators</label>
+                            <label class="float-right"><input id="pullDnsResolutions" type="checkbox"><span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover='false' tabindex=1 title="Checking this box will pull in any DNS resolutions from TC for with any hosts or addressess that already exist in TC">Pull indicators from DNS resolutions</span></label>
+                            <p id="phase-one-next-joyride-target"></p>
+                            <a href="#0" class="button float-right" onclick="UIQB.confirmPhaseOneStart()" id="phase-one-next" style="width: 50%;"> <strong>Next &nbsp&nbsp></strong></a>
+                        </div>
+                    </div>
+
+                    <div class="reveal resized-modal" id="manual-import" data-reveal>
+                        <button class="close-button" data-close aria-label="Close reveal" type="button">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+
+                        <h3>Import Local File</h3>
+                        <i>Upload files (yes, you can upload multiple files!) to import their content</i>
+                        <input type="file" id="import-local" multiple onchange="VUEAPPMANAGER.phaseZeroVue.importFromLocalFile(this.files)">
+
+                        <h3>Import PDF</h3>
+                        <input type="text" name="pdf" placeholder="Enter the URL of a PDF article" autocomplete="off" v-model="importPDF">
+                        <!-- <label class="float-right"><input type="checkbox" v-model="saveDocument">Save PDF as Document</label> -->
+                        <button id="import-pdf" class="button secondary" style="display: inline;" v-on:click="importFromPDF">Import from PDF</button>
+
+                        <h3>Import from URL</h3>
+                        <input type="text" name="url" placeholder="Enter a URL" autocomplete="off" v-model="importURL">
+                        <button id="import-url" class="button secondary" style="display: inline;" v-on:click="importFromURL">Import from URL</button>
+
+                        <h3>Import from Image (OCR)</h3>
+                        <input type="text" name="image" placeholder="Enter the URL to an image" autocomplete="off" v-model="importImage">
+                        <label class="float-right"><input type="checkbox" v-model="ocrAsSubtitle">Parse as Subtitle</label>
+                        <button id="import-image" class="button secondary" style="display: inline;" v-on:click="importFromImage">Submit image for OCR analysis</button>
+                    </div>
+                </div>
+
+                <div id="phase-zero-right" class="small-3 medium-3 large-3 float-right">
+                    <!-- Section for find and replace functionality -->
+                    <div id="find-and-replace" class="well small-11 medium-11 large-11 float-center">
+                        <div class="card-section">
+                            <label>Find all: {{ findCount }}<input id="find-value" class="focused-input" type="text" name="find" v-on:keyup="getFindCount"></label>
+                            <label>Replace with: <input id="replace-value" class="focused-input" type="text" name="replace"></label>
+                            
+                            <button type="button" class="secondary button float-right" v-on:click="findAndReplace(undefined, undefined, true)">Find & replace</button>
+                            <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover='false' tabindex=1 title="This automatically refangs indicators that have been defanged using common defanging techniques.">
+                                <button type="button" class="button secondary" onclick="takeAction()">
+                                    <i class="fa fa-hand-o-left" aria-hidden="true"></i> Quick-refang
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Section for listing recent groups -->
+                    <div id="recent-groups" class="well small-11 medium-11 large-11 float-center" v-if="groupsFound">
+                        <b>Recent Groups</b>
+                        <div class="card-section">
+                            <ul class="fa-ul">
+                                <recent-group v-for="group in recentGroups" v-bind:group="group" :key="group.id"></recent-group>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="small-12 medium-12 large-12 clearfix"></div>
+
+                <br><br>
+
+                <p>If you would like to learn how to use this app, <a href="#0" onclick="TCREQUESTER.clearJoyrideCookies();">click here</a> to take the tour.</p>
+            </div>
+
+            <div v-if="loadingPhaseOne">
+              <center>
+                <div id="loading-div">
+                  <img src="./styles/loading.gif">
+                  <br/>
+                  <h3>Processing{{ loadingSuffix }}</h3>
+                </div>
+              </center>
+            </div>
+        </div>  <!-- end phase-zero -->
+
+        <ol id="phase-zero-joyride" class="joyride">
+            <li data-id="owner-typeahead-input" data-text="Next" class="custom">
+                <h2>Select an Owner</h2>
+                <p>Type the name of the owner in which you would like to create these indicators.</p>
+            </li>
+            <li data-id="indicator-textarea" data-text="Next" class="custom">
+                <h2>Paste Indicators</h2>
+                <p>Paste any indicators you have here.</p>
+            </li>
+            <li data-id="find-value" data-text="Next" class="custom">
+                <h2>Find and Replace</h2>
+                <p>If you want to find a replace any defanged indicators, you can do it here.</p>
+            </li>
+            <li data-id="phase-one-next" data-text="Next" tipLocation="bottom" class="custom">
+                <h2>Continue</h2>
+                <p>Click here to parse indicators from the text and move on to the next step.</p>
+            </li>
+        </ol>
+
+        <div id="phase-one">
+            <!-- add the next button outside of the tabs -->
+            <ul class="tabs" data-tabs id="phase-one-tabs">
+                <li class="tabs-title is-active"><a href="#nonexist-indicators" aria-selected="true"><strong>Indicators not in TC: {{ nonExistIndicatorCount }}</strong></a></li>
+                <li class="tabs-title"><a href="#exist-indicators"><strong>Indicators in TC: {{ indicators.length - nonExistIndicatorCount }}</strong></a></li>
+            </ul>
+
+            <div class="tabs-content well" data-tabs-content="phase-one-tabs">
+                <div class="tabs-panel is-active" id="nonexist-indicators">
+                    <span id="nonexist-create-indicator-joyride-target"></span>
+                    <a href="#0" class="secondary button" v-on:click="createIndicators"><span id="top-create-button">Create indicators</span></a>
+                    <!-- TODO: change the name "data-addCart" and the classname "button-add-cart" of the element below (and the button on the bottom)-->
+                    <span id="nonexist-vt-enrich-joyride-target"></span>
+                    <button data-addCart class="secondary button button-add-cart" v-on:click="gatherFileHashes"><span id="top-enrich-button">Enrich file hashes (uses VT)</span></button>
+                    <span id="nonexist-hash-merge-joyride-target"></span>
+                    <a href="#0" class="secondary button" v-on:click="manualMerge"><span id="top-merge-button">Manually merge file hashes</span></a>
+                    <a href="#0" id="phase-one-next-button" class="button" onclick="UIQB.confirmPhaseTwoStart();"> <strong>Next &nbsp&nbsp></strong></a>
+
+                    <div class="small-3 medium-3 large-3">
+                        <select id="indicator-type-filter" v-on:change="filterPhaseOneIndicators">
+                            <option value="">Show All Indicator Types</option>
+                            <option value="address">Addresses</option>
+                            <option value="emailaddress">Email Addresses</option>
+                            <option value="file">File (Any Hashes)</option>
+                            <option value="file-complete">Complete Files (> 1 Hashes)</option>
+                            <option value="file-md5">File (MD5)</option>
+                            <option value="file-sha1">File (SHA1)</option>
+                            <option value="file-sha256">File (SHA256)</option>
+                            <option value="host">Host</option>
+                            <option value="url">URL</option>
+                        </select>
+                    </div>
+
+                    <!-- TODO: Is this alert used anymore? -->
+                    <div class="callout alert" id="phase-one-alert">
+                        <p class="error-message"></p>
+                    </div>
+
+                    <div id="phase-one-indicators">
+                        <input id="nonexist-indicator-checkbox" class="select-all-checkbox" type="checkbox" v-on:click="toggleSelection"></input><label for="nonexist-indicator-checkbox"><pre><strong>SELECT ALL</strong></pre></label>
+
+                        <listed-indicator v-for="indicator in indicators" v-bind:indicator="indicator" :key="indicator.indicator"></listed-indicator>
+                    </div>
+
+                    <a href="#0" class="secondary button" v-on:click="createIndicators">Create indicators</a>
+                    <button data-addCart class="secondary button button-add-cart" v-on:click="gatherFileHashes"><span>Enrich file hashes (uses VT)</span></button>
+                    <a href="#0" class="secondary button" v-on:click="manualMerge">Manually merge file hashes</a>
+                    <a href="#0" class="button" onclick="UIQB.confirmPhaseTwoStart();"> <strong>Next &nbsp&nbsp></strong></a>
+                </div>
+                <div class="tabs-panel well" id="exist-indicators">
+                    The following indicators already exist in TC and can be modified on the next step:
+                    <br><br>
+
+                    <ul>
+                        <listed-existing-indicator v-for="indicator in indicators" v-bind:indicator="indicator" :key="indicator.indicator"></listed-existing-indicator>
+                    </ul>
+
+                    <a href="#0" class="button" onclick="UIQB.confirmPhaseTwoStart();"> <strong>Next &nbsp&nbsp></strong></a>
+                </div>
+            </div> <!-- end phase-one-tabs -->
+        </div>  <!-- end phase-one -->
+
+        <ol id="phase-one-joyride" class="joyride">
+            <li data-id="nonexist-indicator-checkbox" data-text="Next" class="custom">
+                <h2>Select Indicators</h2>
+                <p>The indicators listed below do not exist in the current owner in TC. Select the indicators you would like to create from the list below.</p>
+            </li>
+            <li data-id="nonexist-create-indicator-joyride-target" data-text="Next" class="custom">
+                <h2>Create Indicators</h2>
+                <p>Click here to create the selected indicator(s).</p>
+            </li>
+            <li data-id="nonexist-vt-enrich-joyride-target" data-text="Next" class="custom">
+                <h2>Use VirusTotal To Deduplicate File Hashes</h2>
+                <p>If you have configured this app to have access to your VT API key, you can use VT to merge file hashes that represent the same file.</p>
+            </li>
+            <li data-id="nonexist-hash-merge-joyride-target" data-text="Next" class="custom">
+                <h2>Merge Two/Three File Hashes</h2>
+                <p>If you want to manually merge file hashes, you can do so by selecting two or three file hashes below and clicking this button.</p>
+            </li>
+            <li data-id="phase-one-next-button" data-text="Next" tipLocation="bottom" class="custom">
+                <h2>Or Continue...</h2>
+                <p>If there are no indicators here that you would like to create, feel free to move on to the next step.</p>
+            </li>
+        </ol>
+
+        <div id="phase-two" v-on:click="setCurrentIndicatorContext">
+            <div id="meta-operations" class="small-11 medium-11 large-11">
+                <span id="first-meta-button"></span>
+                <a class='secondary button' href='#0' data-open='association-modal'>Associations</a>
+                <a class='secondary button' href='#0' data-open='attribute-modal'>Attributes</a>
+                <a class='secondary button' href='#0' data-open='rating-modal'>Ratings</a>
+                <a class='secondary button' href='#0' data-open='sec-label-modal'>Security Labels</a>
+                <a class='secondary button' href='#0' data-open='tag-modal'>Tags</a>
+                <a class='secondary button' href='#0' data-open='profile-modal' title='Apply a profile to the selected indicators'>Profiles</a>
+                <button class='button' data-open='danger-zone' title='Here be dragons' style='background-color: #646469;'>Danger Zone</button>
+
+                <div class="small-6 medium-5 large-5 float-right">
+                    <div class="row float-right">
+                        <div class="button-toggle">
+                          <button class="button is-active" name="filter-group" v-on:click="showAllIndicators">Show ALL Indicators</button>
+                          <button class="button" name="filter-group" v-on:click="showNewIndicators">Show NEW Indicators</button>
+                          <button class="button" name="filter-group" v-on:click="showOldIndicators">Show OLD Indicators</button>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="row">
+                        <div class="small-1 medium-1 large-1 columns">
+                            <span style="vertical-align: -40%;">{{ filteredIndicatorCount }}</span>
+                        </div>
+                        <div class="small-11 medium-11 large-11 columns">
+                            <input id="phase-two-filter" type="text" name="filter" placeholder="Filter indicators..." v-on:keyup="filterPhaseTwoIndicators"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <pre><label><input id="meta-select-all-checkbox" class='select-all-checkbox' type='checkbox' v-on:click='toggleSelection'></input><strong>SELECT ALL</strong></label></pre>
+
+                <div class="clearfix vspace-sm"></div>
+            </div>
+
+            <div class="medium-3 large-3 float-left">
+                <div class="row columns">
+                  <div class="off-canvas-wrapper">
+                    <div class="off-canvas position-left" id="offCanvasLeft1" data-off-canvas>
+                      <!-- Your menu or Off-canvas content goes here -->
+                      <button class="close-button" aria-label="Close menu" type="button" data-close>
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+
+                      <ul>
+                        <li><a href="#phase-two">top</a></li>
+                        <li v-for="block in indicatorBlocks"><a :href="block.vueApp.currentVueElement">{{ block.vueApp.currentVueElement.split("#")[1] }}</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            <div id="footer" class="footerholder">
+                <div class="footer">
+                    <p v-for="group in associatedGroups"><a :href="group.weblink" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> {{ group.name }}</a></p>
+                </div>
+                <button type="button" class="button" data-toggle="offCanvasLeft1">Open navigation</button>
+            </div>
+        </div>  <!-- end phase-two -->
+
+        <ol id="phase-two-joyride" class="joyride">
+            <li data-class="indicator-block-start" data-text="Next" class="custom">
+                <h2>Indicator Blocks</h2>
+                <p>All of the indicators that exist in TC have been split up by type. Each box that contains indicators of a certain type is called an <strong>Indicator Block</strong>.</p>
+            </li>
+            <li data-class="indicator-block-title" data-text="Next" class="custom">
+                <h2>Enrich Indicators from an Indicator Block</h2>
+                <p>The buttons at the top of each indicator block will let you enrich any of the selected indicators from that indicator block.</p>
+            </li>
+            <li data-id="first-meta-button" data-text="Next" class="custom">
+                <h2>Enrich All The Indicators!</h2>
+                <p>The buttons at the very top of the app will enrich <em>all</em> of the selected indicators regardless of indicator type.</p>
+            </li>
+        </ol>
+
+    </div>  <!-- end bulk-indicator-app -->
+
+    <!-- Scripts for the indicator importer -->
+    <script type="text/javascript" src="./js/indicatorImporter.js"></script>
+    <script src="./js/tcRequester.js"></script>
+    <script type="text/javascript" src="./js/suggestionEngine.js"></script>
+    <script src="./js/vueAppManager.js"></script>
+    <script type="text/javascript" src="./js/uiQB.js"></script>
+
+    <!-- Scripts for Foundation -->
+    <script src="./js/vendor/foundation/vendor/what-input.js"></script>
+    <script src="./js/vendor/foundation/vendor/foundation.min.js"></script>
+
+    <!-- Start the app -->
+    <script>
+        // start the app
+        window.onload = function() {
+            UIQB.startApp();
+        };
+    </script>
+</body>
+
+<!-- This template is used to show (a) the non-existent indicators on phase one and (b) the visible indicators in the indicator blocks on phase two. In other words, any case where the determining factor in whether or not an indicator should be shown is indicator.visible. -->
+<template id="listed-indicator">
+    <pre><label class="indicator-select" :indicator-type="indicator.type" :title="indicator.type" v-if="indicator.visible"><input type="checkbox">{{ indicator.indicator }}<a class="indicator-link" :href="indicator.webLink" v-if="indicator.visible && indicator.exists" target="_blank"> <i class="fa fa-external-link" aria-hidden="true"></i></a><span v-if="indicator.new" class="new"> New</span><span v-if="indicator.dnsResolution" class="dnsResolution"> DNS Resolution</span></label></pre>
+</template>
+
+<!-- This template is used to show indicators that already exist in TC (where the .exists attribute determines whether or not the indicator is shown) -->
+<template id="listed-existing-indicator">
+    <pre><li class="indicator-select" :indicator-type="indicator.type" :title="indicator.type" v-if="indicator.exists"><label>{{ indicator.indicator }}<a class="indicator-link" :href="indicator.webLink" target="_blank"> <i class="fa fa-external-link" aria-hidden="true"></i></a><span v-if="indicator.new" class="new"> New</span><span v-if="indicator.dnsResolution" class="dnsResolution"> DNS Resolution</span></label></li></pre>
+</template>
+
+<!-- This template is used to show recent groups in phase zero -->
+<template id="recent-group">
+    <li class="recent-group" :group-type="group.type" :group-id="group.id" :title="group.type"><label><span v-on:click="importFromGroup(group.type, group.id)" class="point-me"><i class="fa-li fa fa-long-arrow-left"></i>{{ group.name }}</span> &nbsp<a class="group-link" :href="group.webLink" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i></a></label></li>
+</template>
+
+</html>
