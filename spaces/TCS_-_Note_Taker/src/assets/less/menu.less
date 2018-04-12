@@ -1,0 +1,40 @@
+@charset "UTF-8";
+@import 'material';
+
+nav {
+  background-color: transparent;
+  line-height: 1.5;
+  width: initial;
+
+  .nav-item {
+
+    .sub-nav-group {
+
+      li {
+        float: none;
+        border: none;
+
+        span {
+          color: @tcOrange;
+          float: right;
+        }
+      }
+
+      .secondary-sub-nav-group {
+        z-index: 2;
+        background-color: WHITE;
+      }
+    }
+  }
+}
+
+h1 {
+  font-weight: 300;
+  font-size: 28px !important;
+  height: 49px !important;
+
+  &.headerSectionIcon-browse {
+    background-image: none;
+    padding-left: 5px;
+  }
+}
