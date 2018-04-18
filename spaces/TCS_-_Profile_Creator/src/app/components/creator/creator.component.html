@@ -1,0 +1,34 @@
+<div class="columns large-2 medium-2">
+    <ul>
+        <li *ngFor="let profile of existingProfiles"><span (click)="displayProfile(profile.name)">{{ profile.name }}</span> &nbsp;&nbsp;<i class="fa fa-trash-o" (click)="deleteProfile(profile.name)"></i></li>
+    </ul>
+</div>
+
+<div class="columns large-10 medium-10">
+    Name:
+    <input type="text" [(ngModel)]="name">
+
+    <hr>
+
+    Attributes:
+    Type: <input type="text" [(ngModel)]="attributeType">
+    Value: <input type="text" [(ngModel)]="attributeValue">
+    Displayed: <input type="checkbox" [(ngModel)]="attributeDisplayed">
+    <ul>
+        <li *ngFor="let attribute of attributes"><span (click)="loadAttribute(attribute.type, attribute.value, attribute.displayed)">{{ attribute.type }}: {{ attribute.value }}</span> &nbsp;&nbsp;<i class="fa fa-trash-o" (click)="deleteAttribute(attribute.type, attribute.value, attribute.displayed)"></i></li>
+    </ul>
+    <button class="button secondary" *ngIf="attributeType !== ''" (click)="updateAttributes()">Add new/updated attribute</button>
+
+    <hr>
+
+    Tags:
+    <input type="text" [(ngModel)]="tag">
+    <ul>
+        <li *ngFor="let tag of tags"><span (click)="loadTag(tag)">{{ tag }}</span> &nbsp;&nbsp;<i class="fa fa-trash-o" (click)="deleteTag(tag)"></i></li>
+    </ul>
+    <button class="button secondary" *ngIf="tag !== ''" (click)="updateTag()">Add new/updated tag</button>
+
+    <br><br>
+
+    <button class="button float-right" (click)="saveProfile()">Save Profile</button>
+</div>

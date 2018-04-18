@@ -1,0 +1,61 @@
+@charset "UTF-8";
+
+@import './material';
+
+@buttonHeight: 36px;
+
+body {
+  margin: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  background-color: WHITE;
+  font-family: 'OpenSans', "Trebuchet MS", Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  color: @text;
+}
+
+.truncate-ellipsis {
+  width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+h1 {
+  font-size: 2em;
+  font-weight: 300;
+}
+
+.tc dt-app {
+  .spaces-item {
+    .spaces-item-element {
+      .action {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .fa-refresh {
+    cursor: pointer;
+  }
+
+  .spaces-sidebar-menu {
+    [class*='fa-toggle'] {
+      cursor: pointer;
+
+      &:before {
+        color: @tcBlue;
+        margin-right: 10px;
+      }
+    }
+  }
+}
+
+#mainContent {
+  position: static;
+}
+
+.ui-widget-content {
+  background-color: WHITE;
+}

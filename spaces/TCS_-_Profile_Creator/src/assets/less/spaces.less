@@ -1,0 +1,112 @@
+@charset "UTF-8";
+
+/* App Global Variable */
+@appHeight: 100%;
+
+// @import 'material';
+@import (reference) 'material';
+// @import 'app';
+@import 'spaces/spaces-loading';
+@import 'spaces/spaces-growl';
+@import 'spaces/spaces-sidebar.less';
+
+/*
+ * Spaces Content
+ */
+
+.spaces-content {
+  transition: all 300ms ease-out;
+  border-left: 1px solid @lighterGray;
+  padding: 0 0 0 20px;
+  float: none;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  height: @appHeight;
+  // @import 'spaces/spaces-container.less';
+  @import 'spaces/spaces-ui-breadcrumb.less';
+  @import 'spaces/spaces-ui-datatable.less';
+  @import 'spaces/spaces-ui-panel.less';
+  @import 'spaces/spaces-ui-splitbutton.less';
+  @import 'spaces/spaces-ui-steps.less';
+  @import 'spaces/spaces-ui-tabview.less';
+  /* common classes */
+  .float-left {
+    float: left;
+  }
+  .float-right {
+    float: right;
+  }
+
+  /* specific to domaintools app */
+  .ui-tabview {
+    float: left;
+  }
+}
+
+/* specific to domaintools app */
+
+.dt-info {
+  margin-top: 20px;
+}
+
+.selected-item {
+  color: @tcOrange;
+}
+
+.fa-refresh {
+  color: @tcBlue;
+  padding-right: 10px;
+}
+
+// whois table
+.whois-history-table-expander {
+    width: 35px;
+}
+
+.whois-history-table-private {
+    width: 35px;
+}
+
+/* media query overrides */
+
+@media all and (max-width: 900px) {
+  // .spaces-content .spaces-item .spaces-item-element {
+  .spaces-content .spaces-item {
+    flex-basis: 100%;
+    overflow: hide;
+  }
+
+  // .spaces-content .spaces-item .element-grow2 {
+  //   flex-grow: 2;
+  //   // width: 100%;
+
+  //   white-space: nowrap;
+  //   overflow: hidden;
+  //   text-overflow: ellipsis;
+  // }
+}
+
+@media all and (max-width: 600px) {
+  .spaces-content .spaces-item .spaces-item-element {
+    flex-basis: 100%;
+    // width: 100%;
+
+    // .spaces-item-element {
+    //   flex-basis: 100%;
+    //   overflow: hide;
+    // }
+  }
+
+  // .element-grow2 {
+  // .spaces-content .spaces-item .element-grow2 {
+  // .spaces-content .spaces-item .spaces-item-element {
+  //   flex-grow: 2;
+  //   // width: 100%;
+  //   overflow: hidden;
+
+  //   content {
+  //     white-space: nowrap;
+  //     text-overflow: ellipsis;
+  //   }
+  // }
+}
