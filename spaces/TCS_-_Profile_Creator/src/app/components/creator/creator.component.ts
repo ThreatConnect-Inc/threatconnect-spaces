@@ -46,6 +46,14 @@ export class CreatorComponent implements OnInit {
     }
 
     saveProfile() {
+        if (this.name === '') {
+            this.messages.showError('Missing data', 'Please enter a name for this profile');
+            return;
+        } else if (this.attributes.length === 0 && this.tags.length === 0) {
+            this.messages.showError('Missing data', 'Please add either attributes or tags to this profile');
+            return;
+        }
+
         let newProfile = {
             name: this.name,
             attributes: this.attributes,
@@ -68,7 +76,7 @@ export class CreatorComponent implements OnInit {
 
     updateAttributes() {
         if (this.attributeType === '' || this.attributeValue === '') {
-            this.messages.showError('Missing data', 'Please make sure this attribute has a type and a value')
+            this.messages.showError('Missing data', 'Please make sure this attribute has a type and a value');
         }
 
         this.attributes.push({

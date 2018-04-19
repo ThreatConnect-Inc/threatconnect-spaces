@@ -1,7 +1,7 @@
 <div class="columns large-2 medium-2">
     <h4>Existing Profiles</h4>
     <ul>
-        <li *ngFor="let profile of db.existingProfiles"><span (click)="displayProfile(profile.name)">{{ profile.name }}</span> &nbsp;&nbsp;<i class="fa fa-trash-o" (click)="deleteProfile(profile.name)"></i></li>
+        <li *ngFor="let profile of db.existingProfiles"><span class="existingProfile" (click)="displayProfile(profile.name)" title="Edit this profile">{{ profile.name }}</span> &nbsp;&nbsp;<i class="fa fa-trash-o" (click)="deleteProfile(profile.name)" title="Delete this profile"></i></li>
     </ul>
 </div>
 
@@ -15,19 +15,21 @@
     Type: <input type="text" [(ngModel)]="attributeType" placeholder="Enter the type of the attribute (e.g. 'Description')">
     Value: <input type="text" [(ngModel)]="attributeValue" placeholder="Enter the value of the attribute">
     Displayed: &nbsp;<input type="checkbox" [(ngModel)]="attributeDisplayed">
+    <br>
+    <button class="button secondary" *ngIf="attributeType !== ''" (click)="updateAttributes()">Add new/updated attribute</button>
     <ul>
         <li *ngFor="let attribute of attributes"><span (click)="displayAttribute(attribute.type, attribute.value, attribute.displayed)">{{ attribute.type }}: {{ attribute.value }}</span> &nbsp;&nbsp;<i class="fa fa-trash-o" (click)="deleteAttribute(attribute.type, attribute.value, attribute.displayed)"></i></li>
     </ul>
-    <button class="button secondary" *ngIf="attributeType !== ''" (click)="updateAttributes()">Add new/updated attribute</button>
 
     <br>
 
     <h4>Tags:</h4>
     <input type="text" [(ngModel)]="tag" placeholder="Enter a tag to add to the profile">
+    <br>
+    <button class="button secondary" *ngIf="tag !== ''" (click)="updateTag()">Add new/updated tag</button>
     <ul>
         <li *ngFor="let tag of tags"><span (click)="displayTag(tag)">{{ tag }}</span> &nbsp;&nbsp;<i class="fa fa-trash-o" (click)="deleteTag(tag)"></i></li>
     </ul>
-    <button class="button secondary" *ngIf="tag !== ''" (click)="updateTag()">Add new/updated tag</button>
 
     <br><br>
 
