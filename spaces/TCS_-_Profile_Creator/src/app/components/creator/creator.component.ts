@@ -60,6 +60,14 @@ export class CreatorComponent implements OnInit {
             tags: this.tags
         };
         this.db.save(newProfile);
+
+        this.name = '';
+        this.attributes = [];
+        this.attributeType = '';
+        this.attributeValue = '';
+        this.attributeDisplayed = false;
+        this.tag = '';
+        this.tags = [];
         this.saved = true;
     }
 

@@ -44,7 +44,9 @@ export class DatastoreService {
         let newData = '{"text": "' + stringified + '"}'
         this.exchangeDB.create(this.domain, this.typeName, this.searchCommand, newData)
             .subscribe(
-                response => {},
+                response => {
+                    this.messages.showSuccess('Success', 'Profile updated')
+                },
                 err => {
                     this.logging.error('Error', err);
                     this.messages.showError('Failed', 'Unable to save data: ' + err);
