@@ -4,6 +4,7 @@ import {
     SpacesMessagesService,
 } from 'spaces-ng/';
 
+import { DatastoreService } from '../../services/datastore.services';
 import { Profile, Attribute } from '../../interfaces';
 
 @Component({
@@ -12,47 +13,53 @@ import { Profile, Attribute } from '../../interfaces';
   styleUrls: ['./creator.component.less']
 })
 export class CreatorComponent implements OnInit {
-    existingProfiles: Profile[];
     name: string = "";
     attributeType: string = "";
     attributeValue: string = "";
     attributeDisplayed: boolean = false;
-    attributes: Attribute[];
+    attributes: Attribute[] = [];
     tag: string = "";
-    tags: string[];
+    tags: string[] = [];
+    saved: boolean = true;
 
     constructor(
         private messages: SpacesMessagesService,
+        public db: DatastoreService
     ) { }
 
     ngOnInit() {
-        this.loadExistingProfiles();
+        this.getExistingProfiles();
     }
 
-    loadExistingProfiles() {
-        // TODO: implement
-        this.existingProfiles = [{
-            name: 'Test Profile',
-            attributes: [{
-                type: 'Description',
-                value: 'test',
-                displayed: true
-            }],
-            tags: ['C2']
-        }]
+    getExistingProfiles() {
+        this.db.getData();
     }
 
     displayProfile(profileName: string) {
-        for (var i = this.existingProfiles.length - 1; i >= 0; i--) {
-            if (this.existingProfiles[i].name === profileName) {
-                this.attributes = this.existingProfiles[i].attributes;
-                this.tags = this.existingProfiles[i].tags;
-                this.name = this.existingProfiles[i].name;
+        for (var i = this.db.existingProfiles.length - 1; i >= 0; i--) {
+            if (this.db.existingProfiles[i].name === profileName) {
+                this.attributes = this.db.existingProfiles[i].attributes;
+                this.tags = this.db.existingProfiles[i].tags;
+                this.name = this.db.existingProfiles[i].name;
             }
         }
     }
 
-    loadAttribute(attributeType, attributeValue, attributeDisplayed) {
+    saveProfile() {
+        let newProfile = {
+            name: this.name,
+            attributes: this.attributes,
+            tags: this.tags
+        };
+        this.db.save(newProfile);
+        this.saved = true;
+    }
+
+    deleteProfile(profileName) {
+        this.db.delete(profileName);
+    }
+
+    displayAttribute(attributeType, attributeValue, attributeDisplayed) {
         this.deleteAttribute(attributeType, attributeValue, attributeDisplayed);
         this.attributeType = attributeType;
         this.attributeValue = attributeValue;
@@ -73,17 +80,20 @@ export class CreatorComponent implements OnInit {
         this.attributeType = '';
         this.attributeValue = '';
         this.attributeDisplayed = false;
+        this.saved = false;
     }
 
     deleteAttribute(attributeType, attributeValue, attributeDisplayed) {
         for (var i = this.attributes.length - 1; i >= 0; i--) {
             if (this.attributes[i].type === attributeType && this.attributes[i].value === attributeValue && this.attributes[i].displayed === attributeDisplayed) {
                 this.attributes.splice(i, 1);
+                this.saved = false;
+                break;
             }
         }
     }
 
-    loadTag(tag) {
+    displayTag(tag) {
         this.deleteTag(tag);
         this.tag = tag;
     }
@@ -96,18 +106,16 @@ export class CreatorComponent implements OnInit {
         this.tags.push(this.tag);
 
         this.tag = '';
+        this.saved = false;
     }
 
     deleteTag(tag) {
         for (var i = this.tags.length - 1; i >= 0; i--) {
             if (this.tags[i] === tag) {
                 this.tags.splice(i, 1);
+                this.saved = false;
+                break;
             }
         }
     }
-
-    saveProfile() {
-        let s = 1;
-    }
-
 }

@@ -57,6 +57,7 @@ import {
     // Url
 } from 'threatconnect-ng';
 import { CreatorComponent } from './components/creator/creator.component';
+import { DatastoreService } from './services/datastore.services';
 
 @NgModule({
     imports: [
@@ -89,6 +90,7 @@ import { CreatorComponent } from './components/creator/creator.component';
         CreatorComponent
     ],
     providers: [
+        DatastoreService,
         /* Bowser Service */
         BowserService,
         /* TC Service */
