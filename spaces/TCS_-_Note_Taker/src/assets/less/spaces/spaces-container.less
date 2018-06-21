@@ -1,0 +1,94 @@
+.spaces-info {
+  position: fixed;
+  padding-left: 10px;
+  top: 0px;
+  padding-bottom: 5px;
+  background-color: white;
+  width: 100%;
+}
+
+.spaces-container {
+  font-family: 'Open Sans', 'Montserrat', HelveticaNeue, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  padding: 0;
+  padding-top: 10px;
+  margin: 0;
+  list-style: none;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  // justify-content: flex-start;
+  align-items: stretch;
+}
+
+.spaces-item {
+  flex-grow: 1;
+  flex-basis: 50%;
+  align-self: flex-start;
+  padding: 10px;
+
+  header {
+    // background-color: @lightGray;
+    font-size: 1.56em;
+  }
+
+  .spaces-item-container {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    // justify-content: space-around;
+    justify-content: space-between;
+    // justify-content: flex-start;
+    // width: 500px;
+  }
+  .spaces-item-element {
+    flex-grow: 1;
+    flex-basis: 50%;
+    align-self: flex-start;
+
+    font-family: 'Open Sans', 'Montserrat', HelveticaNeue, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+    white-space: nowrap;
+    overflow: none;
+    // text-overflow: ellipsis;
+
+    padding: 10px;
+    label {
+      float: left;
+      width: 100%;
+    }
+    // header {
+    //   background-color: #fff;
+    //   padding: 0 0 0 5px;
+    //   font-weight: 200;
+    //   font-size: 90%;
+    // }
+    content {
+      float: left;
+      font-weight: 400;
+
+      .action {
+        color: @tcBlue;
+        padding: 5px;
+      }
+    }
+  }
+  .element-grow2 {
+    flex-grow: 2;
+
+    white-space: normal;
+    overflow: visible;
+    text-overflow: ellipsis;
+  }
+}

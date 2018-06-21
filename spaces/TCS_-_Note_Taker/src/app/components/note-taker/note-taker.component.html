@@ -1,0 +1,15 @@
+<div>
+    <div class="columns large-2 medium-2 small-4">
+        <ul>
+            <li class="listedNote" *ngFor="let note of datastore.notes"><span class="listedNoteTitle" (click)="openNote(note.text, note.id)">{{ note.text | slice:0:50 }}</span>&nbsp;&nbsp;<i class="fa fa-trash-o" (click)="deleteNote(note.text, note.id)"></i></li>
+        </ul>
+    </div>
+
+    <div class="columns large-10 medium-10 small-8">
+        <textarea id="noteInput" [(ngModel)]="noteText" placeholder="Type a note here..." rows="26" (keyup)="saved = false"></textarea>
+        <br><br>
+        <button class="button primary" type="button" (click)="updateNote()" *ngIf="noteId !== ''">Save existing note <b *ngIf="!saved">*</b></button>
+        <button class="button secondary" type="button" (click)="saveNote()">Save as new note <b *ngIf="!saved">*</b></button>
+        <button class="button secondary float-right" type="button" (click)="newNote()">New Note</button>
+    </div>
+</div>
