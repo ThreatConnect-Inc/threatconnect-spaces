@@ -22,7 +22,7 @@ export class DatastoreService {
         /*
          * Get the notes from the datastore
          */
-        this.exchangeDB.read(this.domain, this.typeName, searchCommand)
+        this.exchangeDB.read(this.domain, this.typeName, searchCommand, null, '{"size": 10000}')
             .subscribe(
                 response => {
                     for (var i = response.hits.hits.length - 1; i >= 0; i--) {
