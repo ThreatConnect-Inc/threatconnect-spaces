@@ -25,7 +25,7 @@ export class DatastoreService {
         /*
          * Get the data from the datastore
          */
-        this.exchangeDB.read(this.domain, this.typeName, this.searchCommand)
+        this.exchangeDB.read(this.domain, this.typeName, this.searchCommand, null, '{"size": 10000}')
             .subscribe(
                 response => {
                     this.existingProfiles = JSON.parse(response._source.text);
