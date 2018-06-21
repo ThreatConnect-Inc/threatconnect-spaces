@@ -2,8 +2,8 @@
 
 ## Summary
 
-Investigate many indicators of compromise with many tools in one view. This app is located at [https://github.com/fhightower-tc/mass-indicator-investigator#mass-investigator](https://github.com/fhightower-tc/mass-indicator-investigator#mass-investigator).
+Investigate many indicators of compromise with many tools in one view. This app is located at [https://gitlab.com/fhightower-tc/mass-indicator-investigator](https://gitlab.com/fhightower-tc/mass-indicator-investigator).
 
 ## Dependencies
 
-See [https://github.com/fhightower-tc/mass-indicator-investigator#mass-investigator](https://github.com/fhightower-tc/mass-indicator-investigator#mass-investigator).
+See [https://gitlab.com/fhightower-tc/mass-indicator-investigator](https://gitlab.com/fhightower-tc/mass-indicator-investigator).
