@@ -1,0 +1,11 @@
+{
+  "programVersion" : "0.0.1",
+  "programLanguage" : "NONE",
+  "languageVersion" : "JS",
+  "runtimeLevel" : "SpaceOrganization",
+  "allowOnDemand" : true,
+  "programIcon" : "spaces-icon-import",
+  "allowRunAsUser" : true,
+  "minServerVersion"  : "5.0.0",
+  "params" : [ ]
+}
